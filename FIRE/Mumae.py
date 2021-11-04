@@ -2,43 +2,37 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import openpyxl
 
 
 # 종목
-# stock_list = ['TQQQ','SOXL','TNA','FNGU','UDOW'
-#              ,'FAS','SPXL','UPRO','LABU','YINN'
-#              ,'DFEN','TECL','BNKU','TMF','DRN'
-#              ,'URTY','DPST','NAIL','NRGU','DUSL']
+stock_list = ['TQQQ','SOXL','TNA','FNGU','UDOW'
+             ,'FAS','SPXL','UPRO','LABU','YINN'
+             ,'DFEN','TECL','BNKU','TMF','DRN'
+             ,'URTY','DPST','NAIL','NRGU','DUSL']
 
 
-################## 값 설정 #########################
-
+###################### 값 설정 #########################
 # 해당 주식
-stock_list = ['TQQQ']
-
+# stock_list = ['TQQQ']
 # 초기 금액
 init_cash = 10000
 # 백테스트 시작 날짜
-back_test_start_date = '2021-10-01'
-# 백테스트 기간
+back_test_start_date = '2008-02-01'
+# 백테스트 기간 (1년 평균 : 240)
+test_priod = 240 
 # 평단가 이하 경우 매수 전략 (1: 하루치 전향 매수) 해당 수치 곱하기 개념
 under_price_buy_strategy = 1
 # 평단가 이상 경우 매수 전략 (2: 하루치 절반 매수) 해당 수치 나누기 개념
 upper_price_buy_strategy = 2
 # 40회차후 매도 전략 (1.05 : 5% 수익시 매도)
 after_40th_buy_strategy = 1.1
+########################################################
 
 
-
-###########################################
-
-
-for stock in stock_list :
-
-    # 주식 데이터 가지고 오기
-    data = yf.download(stock,start = back_test_start_date)
-    data=data.reset_index()
-
+### 백테스트 시작
+def start_back_test (data):
+    
     # 컬럼 : 날짜, 잔액, 주식명, 거래회차, 평균단가, 보유수량, 현재가, 전체평가액
     # columns : date, cash, stock, nth, avg_px, hold_nm, cur_px, est_val
     score = pd.DataFrame({'date' : [back_test_start_date]
@@ -64,7 +58,8 @@ for stock in stock_list :
     # 하루 매수 최대치 수량
     day_lim_vol = cur_score.cash / 40
 
-    for i in range(240):
+    # 테스트 기간만큼 실행
+    for i in range(test_priod):
 
         # 매도후 하루 매수 최대치 수량 재설정
         if cur_score.nth == 0 :
@@ -187,10 +182,9 @@ for stock in stock_list :
     #     print("\n_date=[{}],\_cur_px=[{}],\n_before_cash=[{}],\n_buy_vol=[{}],\n_after_cash=[{}],\n_nth=[{}],\n_avg_px=[{}],\n_hold_nm=[{}],\n_est_val=[{}]"
     #           .format(_date,_cur_px,_before_cash,_buy_vol,_after_cash,_nth,_avg_px,_hold_nm,_est_val))
 
+        # data 보다 loop 사이즈가 큰 경우 강제 종료
         if i+1 == len(data) :
             break
-
-    # score.tail()
 
 
     # 그래프 그리기
@@ -226,6 +220,30 @@ for stock in stock_list :
     ax.legend(handles=[p1, p2, p3])
 
     plt.show()
+
+    ### 엑셀저장
+    # plt.savefig("myplot.png", dpi=150)
+
+    # wb = openpyxl.load_workbook('C:/Users/jseung/Quant-master/FIRE/input.xlsx')
+    # ws = wb.active
+
+    # img = openpyxl.drawing.image('myplot.png')
+    # img.anchor(ws.cell('A1'))
+
+    # ws.add_image(img)
+    # wb.save('C:/Users/jseung/Quant-master/FIRE/output.xlsx')
+
+
+### init
+for stock in stock_list :
+
+    # 주식 데이터 가지고 오기
+    data = yf.download(stock,start = back_test_start_date)
+    data=data.reset_index()
+
+    # 백테스트 시작
+    start_back_test(data)
+
 
 
 
