@@ -5,16 +5,16 @@ import matplotlib.pyplot as plt
 
 
 # 종목
-stock_list = ['TQQQ','SOXL','TNA','FNGU','UDOW'
-             ,'FAS','SPXL','UPRO','LABU','YINN'
-             ,'DFEN','TECL','BNKU','TMF','DRN'
-             ,'URTY','DPST','NAIL','NRGU','DUSL']
+# stock_list = ['TQQQ','SOXL','TNA','FNGU','UDOW'
+#              ,'FAS','SPXL','UPRO','LABU','YINN'
+#              ,'DFEN','TECL','BNKU','TMF','DRN'
+#              ,'URTY','DPST','NAIL','NRGU','DUSL']
 
 
 ################## 값 설정 #########################
 
 # 해당 주식
-# stock_list = ['TQQQ','SOXL','TNA','FNGU','UDOW']
+stock_list = ['TQQQ']
 
 # 초기 금액
 init_cash = 10000
@@ -190,38 +190,42 @@ for stock in stock_list :
         if i+1 == len(data) :
             break
 
-    score.tail()
+    # score.tail()
 
 
-    fig = plt.figure(figsize=(10,5)) ## 캔버스 생성
-    fig.set_facecolor('white')
-    ax1 = fig.add_subplot() ## axes 생성
-    
-    color1 = 'r'
-    ax1.plot(score.est_val[1:], color=color1)
-    ax1.set_xlabel('x')
-    ax1.set_ylabel(stock+' evaluation', color=color1)
-    ax1.tick_params(axis='y', labelcolor=color1)
-    
-    color2 = 'b'
-    ax2 = ax1.twinx()
-    ax2.plot(score.cur_px[1:], color=color2)
-    ax2.set_ylabel(stock+' stock_val', color=color2)
-    ax2.tick_params(axis='y', labelcolor=color2)
-    
+    # 그래프 그리기
+    fig, ax = plt.subplots()
+    fig.subplots_adjust(right=0.9)
+
+    twin1 = ax.twinx()
+    twin2 = ax.twinx()
+
+    # Offset the right spine of twin2.  The ticks and label have already been
+    # placed on the right by twinx above.
+    twin2.spines['right'].set_position(("axes", 1.2))
+
+    p1, = ax.plot(score.est_val[1:], "b-", label=stock+' Evaluation')
+    p2, = twin1.plot(score.cur_px[1:], "r-", label=stock+' Stock_val')
+    p3, = twin2.plot(score.nth[1:], "g--", label=stock+' Nth', linestyle='--')
+
+    ax.set_xlabel("Day")
+    ax.set_ylabel("Evaluation")
+    twin1.set_ylabel("Stock_val")
+    twin2.set_ylabel("Nth")
+
+    ax.yaxis.label.set_color(p1.get_color())
+    twin1.yaxis.label.set_color(p2.get_color())
+    twin2.yaxis.label.set_color(p3.get_color())
+
+    tkw = dict(size=4, width=1.5)
+    ax.tick_params(axis='y', colors=p1.get_color(), **tkw)
+    twin1.tick_params(axis='y', colors=p2.get_color(), **tkw)
+    twin2.tick_params(axis='y', colors=p3.get_color(), **tkw)
+    ax.tick_params(axis='x', **tkw)
+
+    ax.legend(handles=[p1, p2, p3])
+
     plt.show()
 
 
-
-    fig = plt.figure(figsize=(10,5)) ## 캔버스 생성
-    fig.set_facecolor('white')
-    ax1 = fig.add_subplot() ## axes 생성
-    
-    color1 = 'g'
-    ax1.plot(score.nth[1:], color=color1)
-    ax1.set_xlabel('x')
-    ax1.set_ylabel(stock+' nth', color=color1)
-    ax1.tick_params(axis='y', labelcolor=color1)
-    
-    plt.show()
 
