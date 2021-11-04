@@ -195,14 +195,14 @@ for stock in stock_list :
 
     # 그래프 그리기
     fig, ax = plt.subplots()
-    fig.subplots_adjust(right=0.9)
+    fig.subplots_adjust(right=0.85)
 
     twin1 = ax.twinx()
     twin2 = ax.twinx()
 
     # Offset the right spine of twin2.  The ticks and label have already been
     # placed on the right by twinx above.
-    twin2.spines['right'].set_position(("axes", 1.2))
+    twin2.spines['right'].set_position(("axes", 1.1))
 
     p1, = ax.plot(score.est_val[1:], "b-", label=stock+' Evaluation')
     p2, = twin1.plot(score.cur_px[1:], "r-", label=stock+' Stock_val')
